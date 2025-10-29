@@ -4,8 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>银河商务 - 专业消费金融服务</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#1d4ed8',
+                        accent: '#93c5fd',
+                        light: '#f8fafc',
+                        dark: '#1e293b'
+                    },
+                    fontFamily: {
+                        sans: ['Open Sans', 'sans-serif'],
+                        heading: ['Poppins', 'sans-serif']
+                    },
+                    transitionProperty: {
+                        'size': 'width, height'
+                    }
+                }
+            }
+        }
+    </script>
     <style>
         :root {
             --primary-color: #0A2463;
@@ -23,11 +47,29 @@
         }
 
         body {
+            @apply bg-light dark:bg-dark transition-colors duration-300;
             font-family: 'Open Sans', sans-serif;
             color: #333;
             line-height: 1.6;
             overflow-x: hidden;
             background-color: var(--light-color);
+        }
+
+        .file-item {
+            @apply transition-all duration-300 hover:scale-[1.02];
+        }
+
+        .announcement-card {
+            @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         h1, h2, h3, h4, h5, h6 {
@@ -1179,45 +1221,13 @@
             <div class="container">
                 <h2 class="section-title">公示公告</h2>
 
-                <div class="announcement-list">
-                    <div class="announcement-item">
-                        <div class="announcement-date">2023-10-15</div>
-                        <h3 class="announcement-title">关于利率调整的公告</h3>
-                        <p>尊敬的客户：根据中国人民银行货币政策及市场利率定价自律机制要求，我行将于2023年11月1日起对部分消费贷款产品利率进行调整...</p>
-                        <a href="#" style="color: var(--secondary-color); font-weight: 600;">查看详情</a>
-                    </div>
-
-                    <div class="announcement-item">
-                        <div class="announcement-date">2023-09-28</div>
-                        <h3 class="announcement-title">2023年国庆节服务时间安排</h3>
-                        <p>尊敬的客户：2023年国庆节期间，我行服务时间调整如下：10月1日至10月3日各营业网点暂停营业，10月4日起恢复正常营业...</p>
-                        <a href="#" style="color: var(--secondary-color); font-weight: 600;">查看详情</a>
-                    </div>
-
-                    <div class="announcement-item">
-                        <div class="announcement-date">2023-09-10</div>
-                        <h3 class="announcement-title">关于防范电信网络诈骗的风险提示</h3>
-                        <p>近期，电信网络诈骗案件高发，不法分子冒充金融机构工作人员实施诈骗。鼎融金融特别提醒您：我公司不会以任何理由要求您提供短信验证码...</p>
-                        <a href="#" style="color: var(--secondary-color); font-weight: 600;">查看详情</a>
-                    </div>
-
-                    <div class="announcement-item">
-                        <div class="announcement-date">2023-08-25</div>
-                        <h3 class="announcement-title">系统升级公告</h3>
-                        <p>为了提供更优质的服务，我行将于2023年8月30日（周三）22:00至8月31日（周四）06:00进行系统升级维护。在此期间，手机银行、网上银行...</p>
-                        <a href="#" style="color: var(--secondary-color); font-weight: 600;">查看详情</a>
-                    </div>
-
-                    <div class="announcement-item">
-                        <div class="announcement-date">2023-08-10</div>
-                        <h3 class="announcement-title">2023年上半年经营业绩报告</h3>
-                        <p>鼎融金融2023年上半年实现营业收入XX亿元，同比增长XX%；净利润XX亿元，同比增长XX%。截至2023年6月末，公司总资产XX亿元...</p>
-                        <a href="#" style="color: var(--secondary-color); font-weight: 600;">查看详情</a>
-                    </div>
+                <div id="announcements-container" class="announcement-list">
+                <!-- 公告将通过JS动态加载 -->
                 </div>
-
-                <div style="text-align: center; margin-top: 40px;">
-                    <a href="#" class="btn">查看更多公告</a>
+                <div id="load-more-container" class="mt-8 text-center hidden"  style="text-align: center; margin-top: 40px;">
+                    <a id="load-more-btn" class="btn">
+                        查看更多公告
+                    </a>
                 </div>
             </div>
         </section>
@@ -1267,6 +1277,24 @@
         </div>
     </footer>
 
+        <!-- 文件查看弹窗 -->
+    <div id="fileModal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-80 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden transition-all duration-300">
+            <div class="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 id="modal-title" class="text-lg font-heading font-medium text-primary"></h3>
+                <button onclick="closeModal()" class="text-gray-500 hover:text-primary text-2xl">&times;</button>
+            </div>
+            <div class="p-4">
+                <iframe id="fileViewer" class="w-full h-[70vh] border border-gray-200 dark:border-gray-700 rounded-lg"></iframe>
+                <div class="mt-4 flex justify-end">
+                    <a id="downloadLink" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition-colors duration-300 flex items-center" href="#" download>
+                        <i class="fas fa-download mr-2"></i> 下载文件
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- 弹窗 -->
     <div id="imageModal" class="modal">
         <span class="close">&times;</span>
@@ -1278,6 +1306,179 @@
 
 
     <script>
+        // 公告数据
+        const announcements = [
+<!--            {-->
+<!--                id: 1,-->
+<!--                title: "关于利率调整的公告",-->
+<!--                date: "2023-10-15",-->
+<!--                content: "尊敬的客户：根据中国人民银行货币政策及市场利率定价自律机制要求，我行将于2023年11月1日起对部分消费贷款产品利率进行调整...",-->
+<!--                files: [-->
+<!--                    { name: "利率调整公告.pdf", type: "pdf" },-->
+<!--                    { name: "利率调整说明.docx", type: "docx" }-->
+<!--                ]-->
+<!--            }-->
+        ];
+
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始加载5条公告
+            loadAnnouncements(0, 5);
+
+            // 如果还有更多公告，显示"查看更多"按钮
+            if (announcements.length > 5) {
+                document.getElementById('load-more-container').classList.remove('hidden');
+                document.getElementById('load-more-btn').addEventListener('click', function() {
+                    loadAllAnnouncements();
+                    this.parentElement.classList.add('hidden');
+                });
+            }
+
+            // 检查系统颜色模式
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.documentElement.classList.add('dark');
+            }
+        });
+
+        // 加载指定范围的公告
+        function loadAnnouncements(start, count) {
+            const container = document.getElementById('announcements-container');
+            const end = Math.min(start + count, announcements.length);
+
+            for (let i = start; i < end; i++) {
+                const announcement = announcements[i];
+                const announcementElement = createAnnouncementElement(announcement);
+                container.appendChild(announcementElement);
+            }
+        }
+
+        // 加载所有公告
+        function loadAllAnnouncements() {
+            const container = document.getElementById('announcements-container');
+            const start = container.children.length;
+
+            for (let i = start; i < announcements.length; i++) {
+                const announcement = announcements[i];
+                const announcementElement = createAnnouncementElement(announcement);
+                container.appendChild(announcementElement);
+            }
+        }
+
+        // 创建公告元素
+        function createAnnouncementElement(announcement) {
+            // 公告区域分割
+            const element = document.createElement('div');
+            element.className = 'announcement-item';
+
+            // 公告头部
+            const header = document.createElement('div');
+            header.className = 'flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 pb-4 border-b border-gray-200 dark:border-gray-700';
+
+            const title = document.createElement('h2');
+            title.className = 'text-xl font-heading font-semibold text-gray-800 dark:text-gray-200 mb-2 sm:mb-0';
+            title.textContent = announcement.title;
+
+            // 时间
+            const date = document.createElement('div');
+            date.className = 'announcement-date';
+            date.textContent = announcement.date;
+
+            header.appendChild(title);
+            header.appendChild(date);
+
+            // 公告内容
+            const content = document.createElement('div');
+            content.className = 'mb-6 text-gray-700 dark:text-gray-300';
+            content.textContent = announcement.content;
+
+            // 文件预览
+            const filesContainer = document.createElement('div');
+            filesContainer.className = 'mt-6 pt-6 border-t border-gray-200 dark:border-gray-700';
+
+            const filesTitle = document.createElement('h3');
+            filesTitle.className = 'text-lg font-heading font-medium text-gray-800 dark:text-gray-200 mb-4';
+            filesTitle.textContent = '相关文件';
+
+            const filesList = document.createElement('div');
+            filesList.className = 'flex flex-wrap gap-3';
+
+            announcement.files.forEach(file => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item flex items-center px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg cursor-pointer';
+                fileItem.onclick = () => openFile(file.name, file.type);
+
+                let iconClass = 'fas fa-file';
+                if (file.type === 'pdf') iconClass = 'fas fa-file-pdf text-red-500';
+                else if (file.type === 'docx') iconClass = 'fas fa-file-word text-blue-500';
+                else if (file.type === 'xlsx') iconClass = 'fas fa-file-excel text-green-500';
+                else if (file.type === 'pptx') iconClass = 'fas fa-file-powerpoint text-orange-500';
+
+                const icon = document.createElement('i');
+                icon.className = `${iconClass} mr-2`;
+
+                const fileName = document.createElement('span');
+                fileName.className = 'text-sm truncate max-w-[180px]';
+                fileName.textContent = file.name;
+
+                fileItem.appendChild(icon);
+                fileItem.appendChild(fileName);
+                filesList.appendChild(fileItem);
+            });
+
+            filesContainer.appendChild(filesTitle);
+            filesContainer.appendChild(filesList);
+
+            // 组装元素
+            element.appendChild(header);
+            element.appendChild(content);
+            element.appendChild(filesContainer);
+
+            return element;
+        }
+
+        // 打开文件函数
+        function openFile(filename, filetype) {
+            const modal = document.getElementById('fileModal');
+            const fileViewer = document.getElementById('fileViewer');
+            const downloadLink = document.getElementById('downloadLink');
+            const modalTitle = document.getElementById('modal-title');
+
+            // 设置文件路径 - 修改为attachment文件夹
+            const filePath = `attachment/${filename}`;
+
+            // 设置下载链接
+            downloadLink.href = filePath;
+            downloadLink.download = filename;
+            modalTitle.textContent = filename;
+
+            // 根据文件类型决定如何显示
+            if (filetype === 'pdf') {
+                // PDF文件可以直接在浏览器中显示
+                fileViewer.src = `${filePath}#toolbar=0&navpanes=0`;
+                modal.classList.remove('hidden');
+            } else if (filetype === 'jpg' || filetype === 'jpeg' || filetype === 'png') {
+                // 图片文件可以直接显示
+                fileViewer.src = filePath;
+                modal.classList.remove('hidden');
+            } else {
+                // 其他文件类型提示下载
+                if (confirm('此文件类型无法在浏览器中直接查看，是否下载到本地？')) {
+                    const a = document.createElement('a');
+                    a.href = filePath;
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                }
+            }
+        }
+
+        // 关闭弹窗
+        function closeModal() {
+            document.getElementById('fileModal').classList.add('hidden');
+            document.getElementById('fileViewer').src = '';
+        }
+
         // 页面切换功能
         document.addEventListener('DOMContentLoaded', function() {
             // 获取所有页面和导航链接
